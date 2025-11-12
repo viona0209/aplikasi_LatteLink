@@ -1,4 +1,4 @@
-//Digunakana untuk membuat jembatan antara aplikasi Flutter dan Supabase
+//Digunakan untuk membuat jembatan antara aplikasi Flutter dan Supabase
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
