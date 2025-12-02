@@ -1,9 +1,14 @@
+import 'package:aplikasi_lattelink/screens/splashscreen.dart';
 import 'package:flutter/material.dart';
+
 import 'services/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // WAJIB! kalau ini tidak dipanggil maka _instance tidak pernah dibuat
   await SupabaseConfig.initialize();
+
   runApp(const MyApp());
 }
 
@@ -14,13 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'LatteLink',
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
-      ),
-      home: Scaffold(
-        body: Center(child: Text('Berhasil jalan tanpa error 🎉')),
-      ),
+      home: SplashScreen(), // ganti sesuai halaman utama kamu
     );
   }
 }

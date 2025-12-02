@@ -1,45 +1,83 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient supabase = Supabase.instance.client;
 
-  //untuk register user baru
+  // -----------------------------
+  // REGISTER USER BARU
+  // -----------------------------
   Future<void> signUp(String name, String email, String password) async {
-    final existingUser = await supabase
-        .from('users')
-        .select()
-        .eq('email', email)
-        .maybeSingle();
+    // 1. Buat akun di Supabase Auth
+    final AuthResponse response = await supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
 
-    if (existingUser != null) {
-      throw Exception('Email sudah terdaftar.');
+    final user = response.user;
+
+    if (user == null) {
+      throw Exception("Gagal membuat akun.");
     }
-    await supabase.from('users').insert({
+
+    // 2. Simpan data user ke tabel profiles
+    await supabase.from('profiles').upsert({
+      'id': user.id,       // sama dengan auth.users.id
       'name': name,
-      'email': email,
-      'password': password,
-      'role': 'officer',
+      'role': 'officer',   // default role
     });
   }
 
-  //untuk login user
-  Future<Map<String, dynamic>?> signIn(String email, String password) async {
-    final response = await supabase
-        .from('users')
-        .select()
-        .eq('email', email)
-        .eq('password', password)
-        .maybeSingle();
+  // -----------------------------
+  // LOGIN USER
+  // -----------------------------
+  Future<Map<String, dynamic>> signIn(String email, String password) async {
+    final AuthResponse response =
+        await supabase.auth.signInWithPassword(email: email, password: password);
 
-    if (response == null) {
-      throw Exception('Email atau password salah.');
+    final user = response.user;
+
+    if (user == null) {
+      throw Exception("Email atau password salah.");
     }
 
-    return response;
+    // Ambil profil user dari tabel profiles
+    final profile = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', user.id)
+        .maybeSingle();
+
+    return {
+      "user": user,
+      "profile": profile,
+    };
   }
 
-  //untuk logout user
+  // -----------------------------
+  // LOGOUT USER
+  // -----------------------------
   Future<void> signOut() async {
-    print('User signed out');
+    await supabase.auth.signOut();
+  }
+
+  // -----------------------------
+  // GET USER YANG SEDANG LOGIN
+  // -----------------------------
+  User? get currentUser => supabase.auth.currentUser;
+
+  // -----------------------------
+  // GET PROFILE USER LOGGED-IN
+  // -----------------------------
+  Future<Map<String, dynamic>?> getCurrentProfile() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return null;
+
+    final data = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', user.id)
+        .maybeSingle();
+
+    return data;
   }
 }
