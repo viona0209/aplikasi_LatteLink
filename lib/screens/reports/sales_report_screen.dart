@@ -7,9 +7,6 @@ class SalesReportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ==========================
-    // TOP SELLING (common data)
-    // ==========================
     final topSellingData = [
       {"name": "Espresso", "price": "25.000", "units": 10},
       {"name": "Cappucino", "price": "20.000", "units": 9},
@@ -17,10 +14,6 @@ class SalesReportScreen extends StatelessWidget {
       {"name": "Matcha", "price": "10.000", "units": 7},
       {"name": "Hazelnut", "price": "5.000", "units": 6},
     ];
-
-    // ==========================
-    // RECENT (daily)
-    // ==========================
     final dailyRecent = [
       {
         "name": "Michael Chen",
@@ -41,18 +34,13 @@ class SalesReportScreen extends StatelessWidget {
         "time": "15.32"
       },
     ];
-
-    // ==========================
-    // CONTENT: DAILY
-    // ==========================
     final daily = [
       const SizedBox(height: 8),
-
       GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 2 kolom
+          crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 1.6,
@@ -84,21 +72,12 @@ class SalesReportScreen extends StatelessWidget {
           ),
         ],
       ),
-
       const SizedBox(height: 16),
-
       TopSellingList(items: topSellingData),
-
       const SizedBox(height: 16),
-
       RecentTransactions(transactions: dailyRecent),
-
       const SizedBox(height: 80),
     ];
-
-    // ==========================
-    // RECENT (weekly)
-    // ==========================
     final weeklyRecent = [
       {
         "name": "Celine Parker",
@@ -113,18 +92,13 @@ class SalesReportScreen extends StatelessWidget {
         "time": "16:02"
       },
     ];
-
-    // ==========================
-    // CONTENT: WEEKLY
-    // ==========================
     final weekly = [
       const SizedBox(height: 8),
-
       GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 2 kolom
+          crossAxisCount: 2, 
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 1.6,
@@ -156,21 +130,12 @@ class SalesReportScreen extends StatelessWidget {
           ),
         ],
       ),
-
       const SizedBox(height: 16),
-
       TopSellingList(items: topSellingData),
-
       const SizedBox(height: 16),
-
       RecentTransactions(transactions: weeklyRecent),
-
       const SizedBox(height: 80),
     ];
-
-    // ==========================
-    // RECENT (monthly)
-    // ==========================
     final monthlySelling = [
       {"name": "Ice Tea", "price": "25.000", "units": 12},
       {"name": "Ice Black", "price": "20.000", "units": 10},
@@ -178,7 +143,6 @@ class SalesReportScreen extends StatelessWidget {
       {"name": "Green Shake", "price": "10.000", "units": 5},
       {"name": "Yunlu", "price": "5.000", "units": 4},
     ];
-
     final monthlyRecent = [
       {
         "name": "Andy",
@@ -193,13 +157,8 @@ class SalesReportScreen extends StatelessWidget {
         "time": "18:22"
       },
     ];
-
-    // ==========================
-    // CONTENT: MONTHLY
-    // ==========================
     final monthly = [
       const SizedBox(height: 8),
-
       GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -236,18 +195,12 @@ class SalesReportScreen extends StatelessWidget {
           ),
         ],
       ),
-
       const SizedBox(height: 16),
-
       TopSellingList(items: monthlySelling),
-
       const SizedBox(height: 16),
-
       RecentTransactions(transactions: monthlyRecent),
-
       const SizedBox(height: 80),
     ];
-
     return ReportTabView(
       dailyContent: daily,
       weeklyContent: weekly,

@@ -7,7 +7,6 @@ class ProfitLossScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final daily = [
       const SizedBox(height: 8),
       const ProfitSummaryGrid(

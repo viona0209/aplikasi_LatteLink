@@ -46,10 +46,7 @@ class ProductCard extends StatelessWidget {
                     padding: const EdgeInsets.all(6),
                     child: ClipOval(
                       child: imageUrl != null && imageUrl!.isNotEmpty
-                          ? Image.network(
-                              imageUrl!,
-                              fit: BoxFit.cover,
-                            )
+                          ? Image.network(imageUrl!, fit: BoxFit.cover)
                           : _placeholderCircle(),
                     ),
                   ),
@@ -76,10 +73,7 @@ class ProductCard extends StatelessWidget {
 
                 Text(
                   "Rp $price",
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 16),
                 ),
 
                 const SizedBox(height: 14),
@@ -96,10 +90,7 @@ class ProductCard extends StatelessWidget {
                 },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  side: const BorderSide(
-                    color: Color(0xFFB05B3B),
-                    width: 2,
-                  ),
+                  side: const BorderSide(color: Color(0xFFB05B3B), width: 2),
                 ),
                 itemBuilder: (context) => [
                   PopupMenuItem(
@@ -153,8 +144,11 @@ class ProductCard extends StatelessWidget {
     return Container(
       color: Colors.grey[300],
       alignment: Alignment.center,
-      child: const Icon(Icons.image_not_supported,
-          size: 40, color: Colors.grey),
+      child: const Icon(
+        Icons.image_not_supported,
+        size: 40,
+        color: Colors.grey,
+      ),
     );
   }
 }

@@ -8,7 +8,7 @@ class EditProductDialog extends StatefulWidget {
   const EditProductDialog({super.key, required this.product});
 
   @override
- State<EditProductDialog> createState() => _EditProductDialogState();
+  State<EditProductDialog> createState() => _EditProductDialogState();
 }
 
 class _EditProductDialogState extends State<EditProductDialog> {
@@ -38,9 +38,15 @@ class _EditProductDialogState extends State<EditProductDialog> {
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.product['name']);
-    priceController = TextEditingController(text: widget.product['price'].toString());
-    stockController = TextEditingController(text: widget.product['stock'].toString());
-    discountController = TextEditingController(text: widget.product['discount'].toString());
+    priceController = TextEditingController(
+      text: widget.product['price'].toString(),
+    );
+    stockController = TextEditingController(
+      text: widget.product['stock'].toString(),
+    );
+    discountController = TextEditingController(
+      text: widget.product['discount'].toString(),
+    );
     imageUrl = widget.product['image_url'];
 
     loadCategories();
@@ -55,8 +61,9 @@ class _EditProductDialogState extends State<EditProductDialog> {
 
       categories = List<Map<String, dynamic>>.from(response);
 
-      final existing = widget.product['categories']?[0]?['categories_id'] ??
-                       widget.product['categories_id'];
+      final existing =
+          widget.product['categories']?[0]?['categories_id'] ??
+          widget.product['categories_id'];
 
       setState(() {
         categoryValue = existing is int ? existing : null;
@@ -73,7 +80,10 @@ class _EditProductDialogState extends State<EditProductDialog> {
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 800);
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+    );
 
     if (picked != null) {
       final bytes = await picked.readAsBytes();
@@ -90,29 +100,31 @@ class _EditProductDialogState extends State<EditProductDialog> {
       nameError = nameController.text.trim().isEmpty
           ? "Name is required"
           : nameController.text.trim().length < 3
-              ? "Min 3 characters"
-              : null;
+          ? "Min 3 characters"
+          : null;
 
       priceError = priceController.text.trim().isEmpty
           ? "Price is required"
           : int.tryParse(priceController.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
       stockError = stockController.text.trim().isEmpty
           ? "Stock is required"
           : int.tryParse(stockController.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
       discountError = discountController.text.trim().isEmpty
           ? "Discount is required"
           : int.tryParse(discountController.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
       categoryError = categoryValue == null ? "Please select category" : null;
-      imageError = (imageUrl == null && pickedImage == null) ? "Image is required" : null;
+      imageError = (imageUrl == null && pickedImage == null)
+          ? "Image is required"
+          : null;
     });
 
     if (nameError != null ||
@@ -134,34 +146,36 @@ class _EditProductDialogState extends State<EditProductDialog> {
       if (pickedImage != null) {
         final bytes = await pickedImage!.readAsBytes();
         final ext = pickedImage!.name.split('.').last;
-        final fileName = "product_${DateTime.now().millisecondsSinceEpoch}.$ext";
+        final fileName =
+            "product_${DateTime.now().millisecondsSinceEpoch}.$ext";
 
-        await supabase.storage.from('items').uploadBinary(
-          fileName,
-          bytes,
-          fileOptions: FileOptions(contentType: "image/$ext"),
-        );
+        await supabase.storage
+            .from('items')
+            .uploadBinary(
+              fileName,
+              bytes,
+              fileOptions: FileOptions(contentType: "image/$ext"),
+            );
 
         finalImageUrl = supabase.storage.from('items').getPublicUrl(fileName);
       }
 
-      await supabase.from('products').update({
-        'name': nameController.text.trim(),
-        'price': int.parse(priceController.text.trim()),
-        'stock': int.parse(stockController.text.trim()),
-        'discount': int.parse(discountController.text.trim()),
-        'categories_id': categoryValue,
-        if (finalImageUrl.isNotEmpty) 'image_url': finalImageUrl,
-      }).eq('id', widget.product['id']);
-
-      // HANYA TUTUP DIALOG + RETURN TRUE — TIDAK ADA SNACKBAR APAPUN
+      await supabase
+          .from('products')
+          .update({
+            'name': nameController.text.trim(),
+            'price': int.parse(priceController.text.trim()),
+            'stock': int.parse(stockController.text.trim()),
+            'discount': int.parse(discountController.text.trim()),
+            'categories_id': categoryValue,
+            if (finalImageUrl.isNotEmpty) 'image_url': finalImageUrl,
+          })
+          .eq('id', widget.product['id']);
       if (mounted) {
         Navigator.pop(context, true);
       }
     } catch (e) {
       debugPrint("Update error: $e");
-      // Kalau gagal → tetap di dialog, error muncul di field (validasi tetap jalan)
-      // Tidak ada snackbar error juga
     }
   }
 
@@ -181,12 +195,15 @@ class _EditProductDialogState extends State<EditProductDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Text("Edit Product",
-                    style: TextStyle(fontSize: isTablet ? 26 : 22, fontWeight: FontWeight.bold)),
+                child: Text(
+                  "Edit Product",
+                  style: TextStyle(
+                    fontSize: isTablet ? 26 : 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
-
-              // IMAGE PREVIEW
               Center(
                 child: Column(
                   children: [
@@ -198,26 +215,40 @@ class _EditProductDialogState extends State<EditProductDialog> {
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           border: Border.all(
-                            color: imageError != null ? Colors.red : Colors.transparent,
+                            color: imageError != null
+                                ? Colors.red
+                                : Colors.transparent,
                             width: 2,
                           ),
                         ),
                         child: previewBytes != null
                             ? Image.memory(previewBytes!, fit: BoxFit.cover)
                             : (imageUrl != null && imageUrl!.isNotEmpty
-                                ? Image.network(imageUrl!, fit: BoxFit.cover)
-                                : const Icon(Icons.image_not_supported, size: 60)),
+                                  ? Image.network(imageUrl!, fit: BoxFit.cover)
+                                  : const Icon(
+                                      Icons.image_not_supported,
+                                      size: 60,
+                                    )),
                       ),
                     ),
                     if (imageError != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 6),
-                        child: Text(imageError!, style: const TextStyle(color: Colors.red, fontSize: 14)),
+                        child: Text(
+                          imageError!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     const SizedBox(height: 10),
                     OutlinedButton(
                       onPressed: pickImage,
-                      child: Text("Change Image", style: TextStyle(fontSize: isTablet ? 18 : 16)),
+                      child: Text(
+                        "Change Image",
+                        style: TextStyle(fontSize: isTablet ? 18 : 16),
+                      ),
                     ),
                   ],
                 ),
@@ -225,15 +256,47 @@ class _EditProductDialogState extends State<EditProductDialog> {
 
               const SizedBox(height: 20),
 
-              _inputField(label: "Product Name", controller: nameController, isTablet: isTablet, error: nameError),
-              _inputField(label: "Price", controller: priceController, type: TextInputType.number, isTablet: isTablet, error: priceError),
-              _inputField(label: "Stock", controller: stockController, type: TextInputType.number, isTablet: isTablet, error: stockError),
-              _inputField(label: "Discount (%)", controller: discountController, type: TextInputType.number, isTablet: isTablet, error: discountError),
+              _inputField(
+                label: "Product Name",
+                controller: nameController,
+                isTablet: isTablet,
+                error: nameError,
+              ),
+              _inputField(
+                label: "Price",
+                controller: priceController,
+                type: TextInputType.number,
+                isTablet: isTablet,
+                error: priceError,
+              ),
+              _inputField(
+                label: "Stock",
+                controller: stockController,
+                type: TextInputType.number,
+                isTablet: isTablet,
+                error: stockError,
+              ),
+              _inputField(
+                label: "Discount (%)",
+                controller: discountController,
+                type: TextInputType.number,
+                isTablet: isTablet,
+                error: discountError,
+              ),
 
-              Text("Category", style: TextStyle(fontSize: isTablet ? 18 : 16, fontWeight: FontWeight.w600)),
+              Text(
+                "Category",
+                style: TextStyle(
+                  fontSize: isTablet ? 18 : 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
@@ -244,7 +307,9 @@ class _EditProductDialogState extends State<EditProductDialog> {
                 child: isCategoryLoading
                     ? const Padding(
                         padding: EdgeInsets.all(12),
-                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                       )
                     : DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
@@ -267,7 +332,10 @@ class _EditProductDialogState extends State<EditProductDialog> {
               if (categoryError != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 6, left: 4),
-                  child: Text(categoryError!, style: const TextStyle(color: Colors.red, fontSize: 14)),
+                  child: Text(
+                    categoryError!,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
                 ),
 
               const SizedBox(height: 26),
@@ -278,11 +346,19 @@ class _EditProductDialogState extends State<EditProductDialog> {
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: isTablet ? 18 : 14),
                     backgroundColor: const Color(0xFF6E200D),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   onPressed: _validateAndSave,
-                  child: const Text("Save Changes",
-                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Save Changes",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -305,29 +381,45 @@ class _EditProductDialogState extends State<EditProductDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: isTablet ? 18 : 16, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: isTablet ? 18 : 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 6),
           TextField(
             controller: controller,
             keyboardType: type,
             onChanged: (_) => setState(() => error = null),
             decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: error != null ? Colors.red : Colors.black26),
+                borderSide: BorderSide(
+                  color: error != null ? Colors.red : Colors.black26,
+                ),
               ),
               focusedBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 borderSide: BorderSide(color: Colors.black, width: 2),
               ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: isTablet ? 18 : 14),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: isTablet ? 18 : 14,
+              ),
             ),
           ),
           if (error != null)
             Padding(
               padding: const EdgeInsets.only(top: 6, left: 4),
-              child: Text(error!, style: const TextStyle(color: Colors.red, fontSize: 14)),
+              child: Text(
+                error!,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+              ),
             ),
         ],
       ),

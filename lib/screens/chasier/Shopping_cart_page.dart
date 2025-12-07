@@ -7,10 +7,7 @@ import 'checkout_page.dart';
 class ShoppingCartPage extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
 
-  const ShoppingCartPage({
-    super.key,
-    required this.cartItems,
-  });
+  const ShoppingCartPage({super.key, required this.cartItems});
 
   @override
   State<ShoppingCartPage> createState() => _ShoppingCartPageState();
@@ -20,38 +17,26 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   final currencyFormat = NumberFormat("#,###", "id_ID");
   final supabase = Supabase.instance.client;
 
-  // ================================
-  //   HITUNG TOTAL – FIXED
-  // ================================
   int get totalPrice {
-    return widget.cartItems.fold<int>(
-      0,
-      (sum, item) {
-        final price = (item['price'] as num).toInt();
-        final qty = item['qty'] as int;
-        return sum + (price * qty);
-      },
-    );
+    return widget.cartItems.fold<int>(0, (sum, item) {
+      final price = (item['price'] as num).toInt();
+      final qty = item['qty'] as int;
+      return sum + (price * qty);
+    });
   }
 
   int get discountTotal {
-    return widget.cartItems.fold<int>(
-      0,
-      (sum, item) {
-        final qty = item['qty'] as int;
-        final discountNominal = (item['discount'] as num?)?.toInt() ?? 0;
-        return sum + (discountNominal * qty);
-      },
-    );
+    return widget.cartItems.fold<int>(0, (sum, item) {
+      final qty = item['qty'] as int;
+      final discountNominal = (item['discount'] as num?)?.toInt() ?? 0;
+      return sum + (discountNominal * qty);
+    });
   }
 
   int get subtotal => totalPrice;
   int get totalDiscount => discountTotal;
   int get grandTotal => totalPrice - discountTotal;
 
-  // ======================================================
-  //                  ORDER → SUPABASE
-  // ======================================================
   Future<void> placeOrder(String paymentMethod, String customerName) async {
     try {
       final user = supabase.auth.currentUser;
@@ -63,20 +48,26 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       int? customerId;
 
       if (customerName.isNotEmpty) {
-        final customer = await supabase.from("customers").insert({
-          "name": customerName,
-        }).select().single();
+        final customer = await supabase
+            .from("customers")
+            .insert({"name": customerName})
+            .select()
+            .single();
 
         customerId = customer["customer_id"];
       }
 
-      final order = await supabase.from("orders").insert({
-        "customer_id": customerId,
-        "user_id": user.id,
-        "payment_method": paymentMethod,
-        "discount_total": totalDiscount,
-        "total_price": grandTotal,
-      }).select().single();
+      final order = await supabase
+          .from("orders")
+          .insert({
+            "customer_id": customerId,
+            "user_id": user.id,
+            "payment_method": paymentMethod,
+            "discount_total": totalDiscount,
+            "total_price": grandTotal,
+          })
+          .select()
+          .single();
 
       final orderId = order["order_id"];
 
@@ -98,69 +89,64 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     } catch (e) {
       debugPrint("Error order: $e");
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal submit order: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal submit order: $e")));
     }
   }
 
   void _showTopNotification(String message) {
-  OverlayEntry overlayEntry;
+    OverlayEntry overlayEntry;
 
-  overlayEntry = OverlayEntry(
-    builder: (context) {
-      return Positioned(
-        top: 40, // posisi dari atas
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Color(0xFF6E200D), // warna primary
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  message,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          top: 40,
+          left: 20,
+          right: 20,
+          child: Material(
+            color: Colors.transparent,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Color(0xFF6E200D),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  // masukkan ke overlay
-  Overlay.of(context).insert(overlayEntry);
+    Overlay.of(context).insert(overlayEntry);
 
-  // hilangkan setelah 2 detik
-  Future.delayed(const Duration(seconds: 2)).then((_) {
-    overlayEntry.remove();
-  });
-}
+    Future.delayed(const Duration(seconds: 2)).then((_) {
+      overlayEntry.remove();
+    });
+  }
 
-  // ======================================================
-  //              POPUP DELETE PRODUCT
-  // ======================================================
   void _showDeleteDialog(int index) {
     showDialog(
       context: context,
@@ -176,10 +162,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               children: [
                 const Text(
                   "Delete Product",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 12),
@@ -219,12 +202,12 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                     Expanded(
                       child: TextButton(
                         onPressed: () {
-  setState(() {
-    widget.cartItems.removeAt(index);
-  });
-  Navigator.pop(context);
-  _showTopNotification("Delete Success"); // ← panggil notifikasi
-},
+                          setState(() {
+                            widget.cartItems.removeAt(index);
+                          });
+                          Navigator.pop(context);
+                          _showTopNotification("Delete Success");
+                        },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           backgroundColor: Color(0xFF6E200D),
@@ -242,7 +225,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -251,10 +234,6 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
   }
 
-  // ======================================================
-  //                       UI
-  // ======================================================
-  @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final isSmall = width < 360;
@@ -399,7 +378,6 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             ),
           ),
 
-          // SUMMARY
           Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -421,9 +399,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             ),
           ),
 
-          // BUTTON ORDER
           Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 26, top: 4),
+            padding: const EdgeInsets.only(
+              left: 20,
+              right: 20,
+              bottom: 26,
+              top: 4,
+            ),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -473,7 +455,10 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 15, color: Colors.black87)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 15, color: Colors.black87),
+          ),
           Text(
             "Rp ${currencyFormat.format(value)}",
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),

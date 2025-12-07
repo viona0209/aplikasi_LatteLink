@@ -14,12 +14,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   String _selectedRole = 'admin';
   bool _isLoading = false;
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
-
-  // Error messages
   String? emailError;
   String? passwordError;
   String? confirmError;
@@ -55,7 +52,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         passwordError = null;
       }
-      // Re-validate confirm password jika password berubah
       _validateConfirmPassword();
     });
   }
@@ -100,12 +96,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final AuthResponse res = await supabase.auth.signUp(
         email: email,
         password: pass,
-        // emailRedirectTo bisa diubah sesuai app kamu
-        // emailRedirectTo: "io.supabase.flutter://login-callback/",
       );
 
       if (res.user == null) {
-        _showMessage("Akun berhasil dibuat! Silakan cek email untuk verifikasi.");
+        _showMessage(
+          "Akun berhasil dibuat! Silakan cek email untuk verifikasi.",
+        );
         return;
       }
 
@@ -139,7 +135,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: msg.contains("berhasil") ? Colors.green.shade600 : Colors.red.shade600,
+        backgroundColor: msg.contains("berhasil")
+            ? Colors.green.shade600
+            : Colors.red.shade600,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -184,23 +182,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               SizedBox(height: height * 0.02),
-
-              // EMAIL FIELD
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "email@gmail.com",
-                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF8B3A22)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16 * base, vertical: 18 * base),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  prefixIcon: const Icon(
+                    Icons.email_outlined,
+                    color: Color(0xFF8B3A22),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16 * base,
+                    vertical: 18 * base,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: emailError != null ? Colors.red : Colors.grey.shade400),
+                    borderSide: BorderSide(
+                      color: emailError != null
+                          ? Colors.red
+                          : Colors.grey.shade400,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF6E200D), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF6E200D),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
@@ -211,33 +222,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 16),
                       const SizedBox(width: 4),
-                      Text(emailError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(
+                        emailError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
 
               SizedBox(height: height * 0.02),
-
-              // PASSWORD FIELD
               TextField(
                 controller: passController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: "password",
-                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF8B3A22)),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: Color(0xFF8B3A22),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16 * base, vertical: 18 * base),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16 * base,
+                    vertical: 18 * base,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: passwordError != null ? Colors.red : Colors.grey.shade400),
+                    borderSide: BorderSide(
+                      color: passwordError != null
+                          ? Colors.red
+                          : Colors.grey.shade400,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF6E200D), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF6E200D),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
@@ -248,29 +280,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 16),
                       const SizedBox(width: 4),
-                      Text(passwordError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(
+                        passwordError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
 
               SizedBox(height: height * 0.02),
-
-              // CONFIRM PASSWORD
               TextField(
                 controller: confirmController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: "confirm password",
-                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF8B3A22)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16 * base, vertical: 18 * base),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: Color(0xFF8B3A22),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16 * base,
+                    vertical: 18 * base,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: confirmError != null ? Colors.red : Colors.grey.shade400),
+                    borderSide: BorderSide(
+                      color: confirmError != null
+                          ? Colors.red
+                          : Colors.grey.shade400,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF6E200D), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF6E200D),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
@@ -281,58 +329,67 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 16),
                       const SizedBox(width: 4),
-                      Text(confirmError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(
+                        confirmError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
 
               SizedBox(height: height * 0.02),
-
-              // SHOW PASSWORD
               Row(
                 children: [
                   Checkbox(
                     activeColor: const Color(0xFF8B3A22),
                     value: !_obscurePassword,
-                    onChanged: (value) => setState(() => _obscurePassword = !(value ?? false)),
+                    onChanged: (value) =>
+                        setState(() => _obscurePassword = !(value ?? false)),
                   ),
                   Text(
                     "show password",
-                    style: TextStyle(fontSize: 15 * fontScale, color: const Color(0xFFB05B3B), fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 15 * fontScale,
+                      color: const Color(0xFFB05B3B),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
 
               SizedBox(height: height * 0.03),
-
-              // ROLE PICKER
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Row(children: [
-                    Radio<String>(
-                      value: 'admin',
-                      groupValue: _selectedRole,
-                      activeColor: const Color(0xFF8B3A22),
-                      onChanged: (v) => setState(() => _selectedRole = v!),
-                    ),
-                    Text("Admin", style: TextStyle(fontSize: 16 * fontScale)),
-                  ]),
-                  Row(children: [
-                    Radio<String>(
-                      value: 'officer',
-                      groupValue: _selectedRole,
-                      activeColor: const Color(0xFF8B3A22),
-                      onChanged: (v) => setState(() => _selectedRole = v!),
-                    ),
-                    Text("Officer", style: TextStyle(fontSize: 16 * fontScale)),
-                  ]),
+                  Row(
+                    children: [
+                      Radio<String>(
+                        value: 'admin',
+                        groupValue: _selectedRole,
+                        activeColor: const Color(0xFF8B3A22),
+                        onChanged: (v) => setState(() => _selectedRole = v!),
+                      ),
+                      Text("Admin", style: TextStyle(fontSize: 16 * fontScale)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Radio<String>(
+                        value: 'officer',
+                        groupValue: _selectedRole,
+                        activeColor: const Color(0xFF8B3A22),
+                        onChanged: (v) => setState(() => _selectedRole = v!),
+                      ),
+                      Text(
+                        "Officer",
+                        style: TextStyle(fontSize: 16 * fontScale),
+                      ),
+                    ],
+                  ),
                 ],
               ),
 
               SizedBox(height: height * 0.05),
-
-              // BUTTON SIGN UP
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -341,13 +398,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     backgroundColor: const Color(0xFF6E200D),
                     disabledBackgroundColor: Colors.grey.shade400,
                     padding: EdgeInsets.symmetric(vertical: 20 * base),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                   child: _isLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                       : Text(
                           "Sign Up",
-                          style: TextStyle(fontSize: 22 * fontScale, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 22 * fontScale,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                 ),
               ),
@@ -357,7 +427,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Text.rich(
                 TextSpan(
                   text: "Already have an account? ",
-                  style: TextStyle(color: Color(0xFFB05B3B), fontSize: 14 * fontScale),
+                  style: TextStyle(
+                    color: Color(0xFFB05B3B),
+                    fontSize: 14 * fontScale,
+                  ),
                   children: [
                     TextSpan(
                       text: "Log In",
@@ -368,7 +441,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fontSize: 15,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
+                        ..onTap = () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        ),
                     ),
                   ],
                 ),

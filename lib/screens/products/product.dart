@@ -20,12 +20,9 @@ class _ProductPageState extends State<ProductPage> {
 
   List<Map<String, dynamic>> products = [];
   bool isLoading = true;
-
   int selectedFilter = 0;
   final TextEditingController searchController = TextEditingController();
   String searchQuery = "";
-
-  // Filter kategori dinamis
   List<String> filterNames = ["All Items"];
 
   @override
@@ -36,10 +33,7 @@ class _ProductPageState extends State<ProductPage> {
 
   Future<void> loadProducts() async {
     setState(() => isLoading = true);
-
     final data = await productService.getProducts();
-
-    // Ambil kategori unik dari Supabase (SEMUA kategori, bukan hanya index 0!)
     Set<String> categorySet = {};
     for (var p in data) {
       final categories = p["categories"] as List<dynamic>?;
@@ -53,45 +47,36 @@ class _ProductPageState extends State<ProductPage> {
         }
       }
     }
-
     setState(() {
       products = data;
-      filterNames = ["All Items", ...categorySet]; // Tambahkan ke filter
+      filterNames = ["All Items", ...categorySet];
       isLoading = false;
     });
   }
 
-  /// FILTER PRODUK
   List<Map<String, dynamic>> get filteredProducts {
     List<Map<String, dynamic>> list = products;
-
-    // Filter kategori
     if (selectedFilter != 0) {
       String selected = filterNames[selectedFilter];
-
       list = list.where((p) {
         final categoriesList = p["categories"] as List<dynamic>?;
-
-        // produk bisa punya banyak kategori → cocokkan salah satu
         if (categoriesList != null && categoriesList.isNotEmpty) {
           return categoriesList.any(
-              (c) => c["name"].toString().toLowerCase() == selected.toLowerCase());
+            (c) => c["name"].toString().toLowerCase() == selected.toLowerCase(),
+          );
         }
-
         return false;
       }).toList();
     }
-
-    // Filter search
     if (searchQuery.isNotEmpty) {
       list = list
-          .where((p) => (p["name"] ?? "")
-              .toString()
-              .toLowerCase()
-              .contains(searchQuery.toLowerCase()))
+          .where(
+            (p) => (p["name"] ?? "").toString().toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            ),
+          )
           .toList();
     }
-
     return list;
   }
 
@@ -105,15 +90,12 @@ class _ProductPageState extends State<ProductPage> {
           width: MediaQuery.of(context).size.width * 0.75,
           height: MediaQuery.of(context).size.height * 0.85,
           margin: const EdgeInsets.only(top: 50, bottom: 120),
-          child: const Material(
-            child: SidebarMenu(selected: "product"),
-          ),
+          child: const Material(child: SidebarMenu(selected: "product")),
         ),
       ),
     );
   }
 
-  // TOP MESSAGE
   void showSuccessMessage(String message) {
     OverlayEntry entry = OverlayEntry(
       builder: (context) => Positioned(
@@ -132,7 +114,7 @@ class _ProductPageState extends State<ProductPage> {
                   color: Colors.black.withOpacity(0.15),
                   blurRadius: 10,
                   offset: Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: Text(
@@ -144,7 +126,6 @@ class _ProductPageState extends State<ProductPage> {
         ),
       ),
     );
-
     Overlay.of(context).insert(entry);
     Future.delayed(const Duration(seconds: 2)).then((_) => entry.remove());
   }
@@ -180,7 +161,9 @@ class _ProductPageState extends State<ProductPage> {
                     onTap: () => Navigator.pop(context, false),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 24),
+                        vertical: 10,
+                        horizontal: 24,
+                      ),
                       decoration: BoxDecoration(
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(10),
@@ -201,7 +184,9 @@ class _ProductPageState extends State<ProductPage> {
                     onTap: () => Navigator.pop(context, true),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 24),
+                        vertical: 10,
+                        horizontal: 24,
+                      ),
                       decoration: BoxDecoration(
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(10),
@@ -236,31 +221,37 @@ class _ProductPageState extends State<ProductPage> {
 
             return Padding(
               padding: const EdgeInsets.only(
-                  top: 24, left: 20, right: 20, bottom: 12),
+                top: 24,
+                left: 20,
+                right: 20,
+                bottom: 12,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // HEADER
                   Row(
                     children: [
                       IconButton(
-                        icon:
-                            const Icon(Icons.menu, color: primaryColor, size: 32),
+                        icon: const Icon(
+                          Icons.menu,
+                          color: primaryColor,
+                          size: 32,
+                        ),
                         onPressed: () => _openSidebar(context),
                       ),
                       const SizedBox(width: 12),
                       const Text(
                         "Product",
                         style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Spacer(),
                     ],
                   ),
 
                   const SizedBox(height: 18),
-
-                  // SEARCH + ADD BUTTON
                   Row(
                     children: [
                       Expanded(
@@ -270,12 +261,16 @@ class _ProductPageState extends State<ProductPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: Color(0xFFAFACAC), width: 2),
+                              color: Color(0xFFAFACAC),
+                              width: 2,
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.search,
-                                  color: Color(0xFFAFACAC)),
+                              const Icon(
+                                Icons.search,
+                                color: Color(0xFFAFACAC),
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: TextField(
@@ -300,7 +295,6 @@ class _ProductPageState extends State<ProductPage> {
                             context: context,
                             builder: (_) => const AddProductDialog(),
                           );
-
                           if (refresh == true) {
                             await loadProducts();
                             showSuccessMessage("Add Product Success !");
@@ -314,17 +308,17 @@ class _ProductPageState extends State<ProductPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Center(
-                            child: Icon(Icons.add,
-                                color: Colors.white, size: 28),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 28,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 18),
-
-                  // FILTER BUTTONS
                   SizedBox(
                     height: 44,
                     child: ListView.builder(
@@ -337,10 +331,13 @@ class _ProductPageState extends State<ProductPage> {
                           child: Container(
                             margin: const EdgeInsets.only(right: 10),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 18, vertical: 8),
+                              horizontal: 18,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
-                              color:
-                                  selected ? primaryColor : Colors.grey.shade200,
+                              color: selected
+                                  ? primaryColor
+                                  : Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
@@ -354,10 +351,7 @@ class _ProductPageState extends State<ProductPage> {
                       },
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
-                  // PRODUCT GRID
                   Expanded(
                     child: isLoading
                         ? const Center(child: CircularProgressIndicator())
@@ -365,16 +359,14 @@ class _ProductPageState extends State<ProductPage> {
                             itemCount: filteredProducts.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 0.85,
-                            ),
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 16,
+                                  crossAxisSpacing: 16,
+                                  childAspectRatio: 0.85,
+                                ),
                             itemBuilder: (context, index) {
                               final p = filteredProducts[index];
-
                               final name = (p["name"] ?? "").toString();
-
                               int price = 0;
                               final rawPrice = p["price"];
                               if (rawPrice is int)
@@ -383,11 +375,9 @@ class _ProductPageState extends State<ProductPage> {
                                 price = rawPrice.toInt();
                               else if (rawPrice is String)
                                 price = int.tryParse(rawPrice) ?? 0;
-
                               final imageUrl =
                                   (p["image"] ?? p["image_url"] ?? "")
                                       .toString();
-
                               final category = (() {
                                 final categoriesList =
                                     p["categories"] as List<dynamic>?;
@@ -397,7 +387,6 @@ class _ProductPageState extends State<ProductPage> {
                                 }
                                 return "-";
                               })();
-
                               return ProductCard(
                                 name: name,
                                 price: price,
@@ -409,38 +398,33 @@ class _ProductPageState extends State<ProductPage> {
                                     builder: (_) =>
                                         EditProductDialog(product: p),
                                   );
-
                                   if (refresh == true) {
                                     await loadProducts();
                                     showSuccessMessage(
-                                        "Edit Product Success !");
+                                      "Edit Product Success !",
+                                    );
                                   }
                                 },
                                 onDelete: () async {
-  final id = p["id"]; // ← ini yang benar
-
-  if (id == null) return;
-
-  // Pop-up konfirmasi
-  final bool confirm = await confirmDelete(context);
-  if (!confirm) return;
-
-  try {
-    // Hapus dari Supabase
-    await Supabase.instance.client
-        .from('products')
-        .delete()
-        .eq('id', id); // ← pakai kolom yang benar
-
-    // Refresh UI
-    await loadProducts();
-
-    // Notifikasi sukses
-    showSuccessMessage("Delete product success !");
-  } catch (e) {
-    print("Delete error: $e");
-  }
-},
+                                  final id = p["id"];
+                                  if (id == null) return;
+                                  final bool confirm = await confirmDelete(
+                                    context,
+                                  );
+                                  if (!confirm) return;
+                                  try {
+                                    await Supabase.instance.client
+                                        .from('products')
+                                        .delete()
+                                        .eq('id', id);
+                                    await loadProducts();
+                                    showSuccessMessage(
+                                      "Delete product success !",
+                                    );
+                                  } catch (e) {
+                                    print("Delete error: $e");
+                                  }
+                                },
                               );
                             },
                           ),

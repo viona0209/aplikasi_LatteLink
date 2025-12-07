@@ -5,9 +5,6 @@ import 'package:aplikasi_lattelink/screens/dashboard/dashboard_stock.dart';
 import 'package:aplikasi_lattelink/screens/dashboard/dashboard_customer.dart';
 import 'package:aplikasi_lattelink/screens/dashboard/dashboard_transaction.dart';
 
-// ============================================================================
-//                               INFO CARD
-// ============================================================================
 class InfoCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -46,7 +43,11 @@ class InfoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: const Color(0xFFB05B3B), size: isSmall ? 22 : 28),
+                Icon(
+                  icon,
+                  color: const Color(0xFFB05B3B),
+                  size: isSmall ? 22 : 28,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -77,9 +78,6 @@ class InfoCard extends StatelessWidget {
   }
 }
 
-// ============================================================================
-//                         DASHBOARD CARDS (REALTIME)
-// ============================================================================
 class DashboardCards extends StatefulWidget {
   final String activeCard;
 
@@ -103,9 +101,6 @@ class _DashboardCardsState extends State<DashboardCards> {
     _setupRealtime();
   }
 
-  // --------------------------------------------------------------------------
-  //   LOAD DATA AWAL
-  // --------------------------------------------------------------------------
   Future<void> _loadCounts() async {
     final products = await supabase.from('products').select();
     final customers = await supabase.from('customers').select();
@@ -120,38 +115,36 @@ class _DashboardCardsState extends State<DashboardCards> {
     });
   }
 
-  // --------------------------------------------------------------------------
-  //   REALTIME LISTENER – SUPABASE V2
-  // --------------------------------------------------------------------------
   void _setupRealtime() {
-    // Products
-    supabase.channel('products_changes').onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'products',
-      callback: (payload) => _loadCounts(),
-    ).subscribe();
-
-    // Customers
-    supabase.channel('customers_changes').onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'customers',
-      callback: (payload) => _loadCounts(),
-    ).subscribe();
-
-    // Transactions
-    supabase.channel('transactions_changes').onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'transactions',
-      callback: (payload) => _loadCounts(),
-    ).subscribe();
+    supabase
+        .channel('products_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'products',
+          callback: (payload) => _loadCounts(),
+        )
+        .subscribe();
+    supabase
+        .channel('customers_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'customers',
+          callback: (payload) => _loadCounts(),
+        )
+        .subscribe();
+    supabase
+        .channel('transactions_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'transactions',
+          callback: (payload) => _loadCounts(),
+        )
+        .subscribe();
   }
 
-  // --------------------------------------------------------------------------
-  //   UI
-  // --------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -211,7 +204,10 @@ class _DashboardCardsState extends State<DashboardCards> {
                 const SizedBox(width: 16),
                 Text(
                   "Transaction ($transactionCount)",
-                  style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

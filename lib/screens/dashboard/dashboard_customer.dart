@@ -25,9 +25,6 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
     setupRealtime();
   }
 
-  // ==========================
-  //     FETCH CUSTOMER
-  // ==========================
   Future<void> fetchCustomers() async {
     try {
       final data = await supabase.from('customers').select('name');
@@ -42,9 +39,6 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
     }
   }
 
-  // ==========================
-  //       REALTIME
-  // ==========================
   void setupRealtime() {
     channel = supabase
         .channel('customers-changes')
@@ -53,7 +47,7 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
           schema: 'public',
           table: 'customers',
           callback: (payload) {
-            fetchCustomers(); // auto refresh
+            fetchCustomers();
           },
         )
         .subscribe();
@@ -65,9 +59,6 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
     super.dispose();
   }
 
-  // ==========================
-  //        UI LAYOUT
-  // ==========================
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -102,11 +93,17 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
                         onPressed: () {
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const DashboardScreen(),
+                            ),
                             (route) => false,
                           );
                         },
-                        icon: const Icon(Icons.arrow_back, size: 28, color: Colors.black),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 28,
+                          color: Colors.black,
+                        ),
                       ),
                       SizedBox(width: isSmall ? 10 : 20),
                       Text(
@@ -152,11 +149,8 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
 
                     SizedBox(height: spacingMedium),
 
-                    // LOADING
                     if (loading)
                       const Center(child: CircularProgressIndicator()),
-
-                    // CUSTOMER LIST
                     if (!loading)
                       Column(
                         children: customers.map((name) {
@@ -186,7 +180,6 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Name
                                 Text(
                                   name,
                                   style: TextStyle(
@@ -194,8 +187,6 @@ class _DashboardCustomerState extends State<DashboardCustomer> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-
-                                // Status
                                 Text(
                                   "Active",
                                   style: TextStyle(

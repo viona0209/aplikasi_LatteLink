@@ -15,12 +15,9 @@ class _StockPageState extends State<StockPage> {
   final Color primary = const Color(0xFF6E200D);
   final TextEditingController searchC = TextEditingController();
   String searchQuery = "";
-
   final supabase = Supabase.instance.client;
-
   List<Map<String, dynamic>> products = [];
   bool isLoading = false;
-
   final String fallbackAsset = 'assets/image/default_product.png';
 
   @override
@@ -48,40 +45,37 @@ class _StockPageState extends State<StockPage> {
   }
 
   Future<void> updateProductStock({
-  required int productId,
-  required int before,
-  required int after,
-}) async {
-  try {
-    final userId = supabase.auth.currentUser?.id;
+    required int productId,
+    required int before,
+    required int after,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
 
-    if (userId == null) {
-      showSuccessToast('Sesi login hilang, silakan login ulang.');
-      return;
+      if (userId == null) {
+        showSuccessToast('Sesi login hilang, silakan login ulang.');
+        return;
+      }
+      await supabase
+          .from('products')
+          .update({'stock': after})
+          .eq('id', productId);
+      await supabase.from('stock_histories').insert({
+        'product_id': productId,
+        'user_id': userId,
+        'change': after - before,
+        'before_stock': before,
+        'after_stock': after,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      await fetchProducts();
+      showSuccessToast('Updated Successfully');
+    } catch (e) {
+      debugPrint('UPDATE STOCK ERROR: $e');
+      showSuccessToast('Update failed');
     }
-
-    /// 1. UPDATE STOCK by ID
-    await supabase.from('products').update({
-      'stock': after,
-    }).eq('id', productId);
-
-    /// 2. INSERT HISTORY (tabel yang benar: stock_histories)
-    await supabase.from('stock_histories').insert({
-      'product_id': productId,
-      'user_id': userId,
-      'change': after - before,
-      'before_stock': before,
-      'after_stock': after,
-      'created_at': DateTime.now().toIso8601String(),
-    });
-
-    await fetchProducts();
-    showSuccessToast('Updated Successfully');
-  } catch (e) {
-    debugPrint('UPDATE STOCK ERROR: $e');
-    showSuccessToast('Update failed');
   }
-}
 
   void showEditPopup(
     BuildContext context,
@@ -95,8 +89,9 @@ class _StockPageState extends State<StockPage> {
     late OverlayEntry entry;
 
     TextEditingController nameC = TextEditingController(text: name);
-    TextEditingController stockC =
-        TextEditingController(text: stock.toString());
+    TextEditingController stockC = TextEditingController(
+      text: stock.toString(),
+    );
 
     entry = OverlayEntry(
       builder: (context) => Positioned(
@@ -116,7 +111,7 @@ class _StockPageState extends State<StockPage> {
                   color: Colors.black.withOpacity(0.16),
                   offset: const Offset(0, 4),
                   blurRadius: 12,
-                )
+                ),
               ],
             ),
             child: Column(
@@ -124,47 +119,63 @@ class _StockPageState extends State<StockPage> {
               children: [
                 Row(
                   children: [
-                    Text("Edit Product",
-                        style: GoogleFonts.poppins(
-                            fontSize: 15, fontWeight: FontWeight.w600)),
+                    Text(
+                      "Edit Product",
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const Spacer(),
                     GestureDetector(
                       onTap: () => entry.remove(),
                       child: const Icon(Icons.close, size: 20),
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Product Name",
-                        style: GoogleFonts.poppins(fontSize: 13))),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Product Name",
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
+                ),
                 const SizedBox(height: 6),
                 TextField(
                   controller: nameC,
                   style: GoogleFonts.poppins(),
                   decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Align(
-                    alignment: Alignment.centerLeft,
-                    child:
-                        Text("Stock", style: GoogleFonts.poppins(fontSize: 13))),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Stock",
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
+                ),
                 const SizedBox(height: 6),
                 TextField(
                   controller: stockC,
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.poppins(),
                   decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -182,42 +193,47 @@ class _StockPageState extends State<StockPage> {
                             await supabase
                                 .from('products')
                                 .update({'name': newName})
-                                .eq('id', productId);// FIXED
+                                .eq('id', productId);
                           }
                         } catch (e) {
                           debugPrint('UPDATE NAME ERROR: $e');
                         }
 
                         await updateProductStock(
-                            productId: productId,
-                            before: stock,
-                            after: newStock);
+                          productId: productId,
+                          before: stock,
+                          after: newStock,
+                        );
 
                         onDone();
                         entry.remove();
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: primary,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text("Update",
-                            style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600)),
+                        child: Text(
+                          "Update",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    )
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),
         ),
       ),
     );
-
     overlayState.insert(entry);
   }
 
@@ -240,17 +256,19 @@ class _StockPageState extends State<StockPage> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.18),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3))
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
               ],
             ),
             child: Text(
               message,
               style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600),
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -295,86 +313,59 @@ class _StockPageState extends State<StockPage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final screenWidth = constraints.maxWidth;
-      final bool isSmall = screenWidth < 360;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final bool isSmall = screenWidth < 360;
 
-      return Scaffold(
-        backgroundColor: Colors.white,
+        return Scaffold(
+          backgroundColor: Colors.white,
 
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(70),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 25, left: 25),
-              child: AppBar(
-                titleSpacing: 0,
-                elevation: 0,
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.white,
-                automaticallyImplyLeading: false,
-                title: Row(
-                  children: [
-                    IconButton(
-                        icon:
-                            Icon(Icons.menu, color: primary, size: isSmall ? 24 : 28),
-                        onPressed: () => _openSidebar(context)),
-                    const SizedBox(width: 10),
-                    Text("Stock Product",
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(70),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 25, left: 25),
+                child: AppBar(
+                  titleSpacing: 0,
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  automaticallyImplyLeading: false,
+                  title: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.menu,
+                          color: primary,
+                          size: isSmall ? 24 : 28,
+                        ),
+                        onPressed: () => _openSidebar(context),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Stock Product",
                         style: TextStyle(
-                            fontSize: isSmall ? 18 : 22,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                actions: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 20),
-                    decoration: BoxDecoration(
+                          fontSize: isSmall ? 18 : 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    Container(
+                      margin: const EdgeInsets.only(right: 20),
+                      decoration: BoxDecoration(
                         color: primary,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: IconButton(
-                      icon: const Icon(Icons.history, color: Colors.white),
-                      onPressed: () => Navigator.push(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.history, color: Colors.white),
+                        onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const HistoryPage())),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        body: Column(
-          children: [
-            const SizedBox(height: 22),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: Container(
-                height: 56,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border:
-                      Border.all(color: const Color(0xFFAFACAC), width: 2),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.search, color: Color(0xFFAFACAC)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: searchC,
-                        onChanged: (v) =>
-                            setState(() => searchQuery = v),
-                        style: GoogleFonts.poppins(),
-                        decoration: InputDecoration(
-                          hintText: 'Search product...',
-                          hintStyle: GoogleFonts.poppins(
-                              color: const Color(0xFFAFACAC), fontSize: 16),
-                          border: InputBorder.none,
+                            builder: (_) => const HistoryPage(),
+                          ),
                         ),
                       ),
                     ),
@@ -382,186 +373,239 @@ class _StockPageState extends State<StockPage> {
                 ),
               ),
             ),
+          ),
 
-            const SizedBox(height: 20),
+          body: Column(
+            children: [
+              const SizedBox(height: 22),
 
-            Expanded(
-              child: Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 28),
                 child: Container(
-                  padding: const EdgeInsets.all(14),
+                  height: 56,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color:
-                            const Color(0xFFD79771).withOpacity(0.40),
-                        width: 1.4),
-                    boxShadow: [
-                      BoxShadow(
-                          color: const Color(0xFFD79771)
-                              .withOpacity(0.20),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4))
+                      color: const Color(0xFFAFACAC),
+                      width: 2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Color(0xFFAFACAC)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: searchC,
+                          onChanged: (v) => setState(() => searchQuery = v),
+                          style: GoogleFonts.poppins(),
+                          decoration: InputDecoration(
+                            hintText: 'Search product...',
+                            hintStyle: GoogleFonts.poppins(
+                              color: const Color(0xFFAFACAC),
+                              fontSize: 16,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView(
-                          children: products
-                              .where((p) {
-                                final q =
-                                    searchQuery.trim().toLowerCase();
-                                if (q.isEmpty) return true;
-                                return p["name"]
-                                    .toString()
-                                    .toLowerCase()
-                                    .contains(q);
-                              })
-                              .map((p) {
-                                final int id = int.tryParse(p["id"].toString()) ?? 0;
-                                final String name = p["name"] ?? "";
-                                final int stock =
-                                    int.tryParse(p["stock"].toString()) ?? 0;
-                                final String? imageUrl =
-                                    p["image_url"]?.toString();
-                                final bool low = stock <= 10;
-
-                                return Column(
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: 64,
-                                          height: 64,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(14),
-                                            border: Border.all(
-                                                color: const Color(
-                                                        0xFFD79771)
-                                                    .withOpacity(0.40),
-                                                width: 1.4),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: const Color(
-                                                          0xFFD79771)
-                                                      .withOpacity(0.30),
-                                                  blurRadius: 8,
-                                                  offset:
-                                                      const Offset(0, 3))
-                                            ],
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(14),
-                                            child: (imageUrl != null &&
-                                                    imageUrl.isNotEmpty)
-                                                ? Image.network(imageUrl,
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder:
-                                                        (c, e, s) =>
-                                                            Image.asset(
-                                                                fallbackAsset))
-                                                : Image.asset(
-                                                    fallbackAsset),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 14),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(name,
-                                                  style:
-                                                      GoogleFonts.poppins(
-                                                          fontSize: 17,
-                                                          fontWeight:
-                                                              FontWeight
-                                                                  .w600)),
-                                              const SizedBox(height: 4),
-                                              Text('Stock : $stock',
-                                                  style:
-                                                      GoogleFonts.poppins(
-                                                          color: Colors
-                                                              .black54)),
-                                              const SizedBox(height: 8),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets
-                                                        .symmetric(
-                                                            horizontal: 10,
-                                                            vertical: 6),
-                                                decoration: BoxDecoration(
-                                                  color: low
-                                                      ? Colors.red.shade100
-                                                      : Colors
-                                                          .green.shade100,
-                                                  borderRadius:
-                                                      BorderRadius
-                                                          .circular(10),
-                                                ),
-                                                child: Text(
-                                                  low
-                                                      ? "⚠️ Stock is running low"
-                                                      : "Ready",
-                                                  style:
-                                                      GoogleFonts.poppins(
-                                                    color: low
-                                                        ? Colors.red
-                                                        : Colors.green
-                                                            .shade900,
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Builder(builder: (editCtx) {
-                                          return IconButton(
-                                            icon: Icon(Icons.edit,
-                                                color: primary, size: 22),
-                                            onPressed: () {
-                                              final box =
-                                                  editCtx.findRenderObject()
-                                                      as RenderBox;
-                                              final pos =
-                                                  box.localToGlobal(
-                                                      Offset.zero);
-
-                                              showEditPopup(
-                                                  context,
-                                                  pos,
-                                                  productId: id,
-                                                  name: name,
-                                                  stock: stock,
-                                                  onDone: () {});
-                                            },
-                                          );
-                                        }),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Divider(color: Colors.grey.shade300),
-                                    const SizedBox(height: 10),
-                                  ],
-                                );
-                              }).toList(),
-                        ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
+
+              const SizedBox(height: 20),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFD79771).withOpacity(0.40),
+                        width: 1.4,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFD79771).withOpacity(0.20),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView(
+                            children: products
+                                .where((p) {
+                                  final q = searchQuery.trim().toLowerCase();
+                                  if (q.isEmpty) return true;
+                                  return p["name"]
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(q);
+                                })
+                                .map((p) {
+                                  final int id =
+                                      int.tryParse(p["id"].toString()) ?? 0;
+                                  final String name = p["name"] ?? "";
+                                  final int stock =
+                                      int.tryParse(p["stock"].toString()) ?? 0;
+                                  final String? imageUrl = p["image_url"]
+                                      ?.toString();
+                                  final bool low = stock <= 10;
+
+                                  return Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 64,
+                                            height: 64,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: const Color(
+                                                  0xFFD79771,
+                                                ).withOpacity(0.40),
+                                                width: 1.4,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFD79771,
+                                                  ).withOpacity(0.30),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              child:
+                                                  (imageUrl != null &&
+                                                      imageUrl.isNotEmpty)
+                                                  ? Image.network(
+                                                      imageUrl,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (c, e, s) =>
+                                                          Image.asset(
+                                                            fallbackAsset,
+                                                          ),
+                                                    )
+                                                  : Image.asset(fallbackAsset),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  name,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  'Stock : $stock',
+                                                  style: GoogleFonts.poppins(
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: low
+                                                        ? Colors.red.shade100
+                                                        : Colors.green.shade100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    low
+                                                        ? "⚠️ Stock is running low"
+                                                        : "Ready",
+                                                    style: GoogleFonts.poppins(
+                                                      color: low
+                                                          ? Colors.red
+                                                          : Colors
+                                                                .green
+                                                                .shade900,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Builder(
+                                            builder: (editCtx) {
+                                              return IconButton(
+                                                icon: Icon(
+                                                  Icons.edit,
+                                                  color: primary,
+                                                  size: 22,
+                                                ),
+                                                onPressed: () {
+                                                  final box =
+                                                      editCtx.findRenderObject()
+                                                          as RenderBox;
+                                                  final pos = box.localToGlobal(
+                                                    Offset.zero,
+                                                  );
+
+                                                  showEditPopup(
+                                                    context,
+                                                    pos,
+                                                    productId: id,
+                                                    name: name,
+                                                    stock: stock,
+                                                    onDone: () {},
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Divider(color: Colors.grey.shade300),
+                                      const SizedBox(height: 10),
+                                    ],
+                                  );
+                                })
+                                .toList(),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

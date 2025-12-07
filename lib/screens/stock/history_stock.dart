@@ -12,7 +12,6 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   final supabase = Supabase.instance.client;
-
   List historyList = [];
   bool isLoading = true;
 
@@ -27,7 +26,8 @@ class _HistoryPageState extends State<HistoryPage> {
       final res = await supabase
           .from("stock_histories")
           .select(
-              "id, change, before_stock, after_stock, created_at, product_id, products (name, image_url)")
+            "id, change, before_stock, after_stock, created_at, product_id, products (name, image_url)",
+          )
           .order("created_at", ascending: false);
 
       setState(() {
@@ -47,12 +47,8 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // Responsive padding
     final double topPadding = screenWidth < 600 ? 30 : 60;
     final double sidePadding = screenWidth < 600 ? 20 : 40;
-
-    // Responsive image size
     final double imageSize = screenWidth < 600 ? 50 : 60;
 
     return Scaffold(
@@ -67,7 +63,6 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // HEADER
             Row(
               children: [
                 GestureDetector(
@@ -84,13 +79,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: const Color(0xFF6E200D).withOpacity(.4),
@@ -98,123 +93,109 @@ class _HistoryPageState extends State<HistoryPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? const Center(child: CircularProgressIndicator())
                     : historyList.isEmpty
-                        ? Center(
-                            child: Text(
-                              "No history recorded",
-                              style: GoogleFonts.poppins(
-                                color: Colors.black54,
-                                fontSize: screenWidth < 600 ? 14 : 16,
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: historyList.length,
-                            itemBuilder: (_, i) {
-                              final h = historyList[i];
-                              final p = h["products"] ?? {};
-
-                              final img = p["image_url"];
-                              final name = p["name"] ?? "-";
-
-                              return Column(
+                    ? Center(
+                        child: Text(
+                          "No history recorded",
+                          style: GoogleFonts.poppins(
+                            color: Colors.black54,
+                            fontSize: screenWidth < 600 ? 14 : 16,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: historyList.length,
+                        itemBuilder: (_, i) {
+                          final h = historyList[i];
+                          final p = h["products"] ?? {};
+                          final img = p["image_url"];
+                          final name = p["name"] ?? "-";
+                          return Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  Container(
+                                    width: imageSize,
+                                    height: imageSize,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: img == null
+                                          ? const Icon(Icons.image, size: 28)
+                                          : Image.network(
+                                              img,
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          name,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: screenWidth < 600
+                                                ? 15
+                                                : 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          "${h["change"] > 0 ? "+" : ""}${h["change"]}",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: screenWidth < 600
+                                                ? 14
+                                                : 15,
+                                            color: h["change"] > 0
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      // IMAGE
-                                      Container(
-                                        width: imageSize,
-                                        height: imageSize,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                          border: Border.all(
-                                              color: Colors.grey.shade300),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                          child: img == null
-                                              ? const Icon(Icons.image, size: 28)
-                                              : Image.network(img,
-                                                  fit: BoxFit.cover),
+                                      Text(
+                                        formatDate(h["created_at"]),
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: screenWidth < 600 ? 13 : 15,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-
-                                      // TEXT AREA
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              name,
-                                              style: GoogleFonts.poppins(
-                                                fontSize: screenWidth < 600
-                                                    ? 15
-                                                    : 17,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              "${h["change"] > 0 ? "+" : ""}${h["change"]}",
-                                              style: GoogleFonts.poppins(
-                                                fontSize: screenWidth < 600
-                                                    ? 14
-                                                    : 15,
-                                                color: h["change"] > 0
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                              ),
-                                            ),
-                                          ],
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        "Stock : ${h["after_stock"]}",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.black54,
+                                          fontSize: screenWidth < 600 ? 12 : 14,
                                         ),
-                                      ),
-
-                                      // DATE + STOCK
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            formatDate(h["created_at"]),
-                                            style: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: screenWidth < 600
-                                                  ? 13
-                                                  : 15,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            "Stock : ${h["after_stock"]}",
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.black54,
-                                              fontSize: screenWidth < 600
-                                                  ? 12
-                                                  : 14,
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                     ],
                                   ),
-
-                                  const SizedBox(height: 12),
-                                  Divider(color: Colors.grey.shade300),
-                                  const SizedBox(height: 12),
                                 ],
-                              );
-                            }),
+                              ),
+                              const SizedBox(height: 12),
+                              Divider(color: Colors.grey.shade300),
+                              const SizedBox(height: 12),
+                            ],
+                          );
+                        },
+                      ),
               ),
-            )
+            ),
           ],
         ),
       ),

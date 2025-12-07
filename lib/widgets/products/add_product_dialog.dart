@@ -23,7 +23,6 @@ class _AddProductDialogState extends State<AddProductDialog> {
   final ProductService productService = ProductService();
   List<Map<String, dynamic>> categories = [];
 
-  // ERROR STATE — INI YANG BIKIN VALIDASI MUNCUL DI BAWAH KOLOM
   String? nameError;
   String? priceError;
   String? stockError;
@@ -52,43 +51,43 @@ class _AddProductDialogState extends State<AddProductDialog> {
     if (url != null) {
       setState(() {
         imageUrl = url;
-        imageError = null; // hapus error kalau sudah pilih gambar
+        imageError = null;
       });
     }
   }
 
-  // VALIDASI PER KOLOM
   void _validateAndSave() {
     setState(() {
       nameError = nameC.text.trim().isEmpty
           ? "Name is required"
           : nameC.text.trim().length < 3
-              ? "Min 3 characters"
-              : null;
+          ? "Min 3 characters"
+          : null;
 
       priceError = priceC.text.trim().isEmpty
           ? "Price is required"
           : int.tryParse(priceC.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
       stockError = stockC.text.trim().isEmpty
           ? "Stock is required"
           : int.tryParse(stockC.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
       discountError = discountC.text.trim().isEmpty
           ? "Discount is required"
           : int.tryParse(discountC.text.trim()) == null
-              ? "Must be a number"
-              : null;
+          ? "Must be a number"
+          : null;
 
-      categoryError = selectedCategoryId == null ? "Please select category" : null;
+      categoryError = selectedCategoryId == null
+          ? "Please select category"
+          : null;
       imageError = imageUrl == null ? "Please choose an image" : null;
     });
 
-    // Jika ada error → stop
     if (nameError != null ||
         priceError != null ||
         stockError != null ||
@@ -98,7 +97,6 @@ class _AddProductDialogState extends State<AddProductDialog> {
       return;
     }
 
-    // Jika lolos validasi → simpan
     saveProduct();
   }
 
@@ -123,9 +121,9 @@ class _AddProductDialogState extends State<AddProductDialog> {
     if (success && mounted) {
       Navigator.pop(context, true);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to add product")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to add product")));
     }
   }
 
@@ -148,7 +146,10 @@ class _AddProductDialogState extends State<AddProductDialog> {
               Center(
                 child: Text(
                   "Add Product",
-                  style: TextStyle(fontSize: isTablet ? 30 : 26, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: isTablet ? 30 : 26,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -159,17 +160,32 @@ class _AddProductDialogState extends State<AddProductDialog> {
               const SizedBox(height: 12),
 
               _label("Price (Rp)", isTablet),
-              _input(priceC, number: true, isTablet: isTablet, errorText: priceError),
+              _input(
+                priceC,
+                number: true,
+                isTablet: isTablet,
+                errorText: priceError,
+              ),
               if (priceError != null) _errorText(priceError!),
               const SizedBox(height: 12),
 
               _label("Stock", isTablet),
-              _input(stockC, number: true, isTablet: isTablet, errorText: stockError),
+              _input(
+                stockC,
+                number: true,
+                isTablet: isTablet,
+                errorText: stockError,
+              ),
               if (stockError != null) _errorText(stockError!),
               const SizedBox(height: 12),
 
               _label("Discount (Rp)", isTablet),
-              _input(discountC, number: true, isTablet: isTablet, errorText: discountError),
+              _input(
+                discountC,
+                number: true,
+                isTablet: isTablet,
+                errorText: discountError,
+              ),
               if (discountError != null) _errorText(discountError!),
               const SizedBox(height: 12),
 
@@ -177,40 +193,70 @@ class _AddProductDialogState extends State<AddProductDialog> {
                 builder: (context, constraint) {
                   final isRow = constraint.maxWidth > 380;
                   return isRow
-                      ? Row(children: [
-                          Expanded(child: _categorySection(isTablet, categoryError)),
-                          const SizedBox(width: 12),
-                          Expanded(child: _imageSection(isTablet, imageError)),
-                        ])
-                      : Column(children: [
-                          _categorySection(isTablet, categoryError),
-                          const SizedBox(height: 14),
-                          _imageSection(isTablet, imageError),
-                        ]);
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: _categorySection(isTablet, categoryError),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _imageSection(isTablet, imageError),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _categorySection(isTablet, categoryError),
+                            const SizedBox(height: 14),
+                            _imageSection(isTablet, imageError),
+                          ],
+                        );
                 },
               ),
 
               const SizedBox(height: 25),
 
-              Row(children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : () => Navigator.pop(context),
-                    style: _btn(isTablet),
-                    child: Text("Cancel", style: TextStyle(fontSize: isTablet ? 20 : 18, color: Colors.white)),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.pop(context),
+                      style: _btn(isTablet),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: isTablet ? 20 : 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _validateAndSave,
-                    style: _btn(isTablet),
-                    child: isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white))
-                        : Text("Add", style: TextStyle(fontSize: isTablet ? 20 : 18, color: Colors.white)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _validateAndSave,
+                      style: _btn(isTablet),
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              "Add",
+                              style: TextStyle(
+                                fontSize: isTablet ? 20 : 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ],
           ),
         ),
@@ -218,72 +264,107 @@ class _AddProductDialogState extends State<AddProductDialog> {
     );
   }
 
-  // ERROR TEXT DI BAWAH FIELD
   Widget _errorText(String text) => Padding(
-        padding: const EdgeInsets.only(top: 6, left: 4),
-        child: Text(text, style: const TextStyle(color: Colors.red, fontSize: 13)),
-      );
+    padding: const EdgeInsets.only(top: 6, left: 4),
+    child: Text(text, style: const TextStyle(color: Colors.red, fontSize: 13)),
+  );
 
   Widget _categorySection(bool isTablet, String? error) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _label("Category", isTablet),
-      DropdownButtonFormField<int>(
-        decoration: _dropdownDecoration(isTablet).copyWith(
-          errorText: error,
-          errorStyle: const TextStyle(color: Colors.red),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _label("Category", isTablet),
+        DropdownButtonFormField<int>(
+          decoration: _dropdownDecoration(isTablet).copyWith(
+            errorText: error,
+            errorStyle: const TextStyle(color: Colors.red),
+          ),
+          value: selectedCategoryId,
+          items: categories
+              .map(
+                (c) => DropdownMenuItem<int>(
+                  value: c["categories_id"],
+                  child: Text(c["name"]),
+                ),
+              )
+              .toList(),
+          onChanged: (v) => setState(() {
+            selectedCategoryId = v;
+            categoryError = null;
+          }),
         ),
-        value: selectedCategoryId,
-        items: categories
-            .map((c) => DropdownMenuItem<int>(value: c["categories_id"], child: Text(c["name"])))
-            .toList(),
-        onChanged: (v) => setState(() {
-          selectedCategoryId = v;
-          categoryError = null;
-        }),
-      ),
-    ]);
+      ],
+    );
   }
 
   Widget _imageSection(bool isTablet, String? error) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _label("Image", isTablet),
-      GestureDetector(
-        onTap: pickImage,
-        child: Container(
-          height: isTablet ? 150 : 120,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: error != null ? Colors.red : Colors.black26, width: error != null ? 2 : 1),
-            color: Colors.grey[100],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _label("Image", isTablet),
+        GestureDetector(
+          onTap: pickImage,
+          child: Container(
+            height: isTablet ? 150 : 120,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: error != null ? Colors.red : Colors.black26,
+                width: error != null ? 2 : 1,
+              ),
+              color: Colors.grey[100],
+            ),
+            child: imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(imageUrl!, fit: BoxFit.cover),
+                  )
+                : Center(
+                    child: Text(
+                      "Choose",
+                      style: TextStyle(fontSize: isTablet ? 20 : 16),
+                    ),
+                  ),
           ),
-          child: imageUrl != null
-              ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(imageUrl!, fit: BoxFit.cover))
-              : Center(child: Text("Choose", style: TextStyle(fontSize: isTablet ? 20 : 16))),
         ),
-      ),
-      if (error != null) _errorText(error),
-    ]);
+        if (error != null) _errorText(error),
+      ],
+    );
   }
 
   Widget _label(String text, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 4),
-      child: Text(text, style: TextStyle(fontSize: isTablet ? 20 : 17, fontWeight: FontWeight.w700)),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: isTablet ? 20 : 17,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 
-  Widget _input(TextEditingController c,
-      {bool number = false, required bool isTablet, String? errorText}) {
+  Widget _input(
+    TextEditingController c, {
+    bool number = false,
+    required bool isTablet,
+    String? errorText,
+  }) {
     return Container(
       height: isTablet ? 50 : 42,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: errorText != null ? Colors.red : Colors.black26, width: errorText != null ? 2 : 1),
+        border: Border.all(
+          color: errorText != null ? Colors.red : Colors.black26,
+          width: errorText != null ? 2 : 1,
+        ),
       ),
       child: TextField(
         controller: c,
         keyboardType: number ? TextInputType.number : TextInputType.text,
-        onChanged: (_) => setState(() => errorText = null), // real-time clear error
+        onChanged: (_) =>
+            setState(() => errorText = null), // real-time clear error
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -295,18 +376,31 @@ class _AddProductDialogState extends State<AddProductDialog> {
 
   InputDecoration _dropdownDecoration(bool isTablet) {
     return InputDecoration(
-      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: isTablet ? 16 : 12),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: isTablet ? 16 : 12,
+      ),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black26)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width: 2)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.black26),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.black, width: 2),
+      ),
     );
   }
 
   ButtonStyle _btn(bool isTablet) {
     return ButtonStyle(
       backgroundColor: MaterialStateProperty.all(primaryColor),
-      padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: isTablet ? 16 : 12)),
-      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+      padding: MaterialStateProperty.all(
+        EdgeInsets.symmetric(vertical: isTablet ? 16 : 12),
+      ),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 

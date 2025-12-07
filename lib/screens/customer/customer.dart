@@ -1,7 +1,3 @@
-// ===============================================================
-// CUSTOMER PAGE — DENGAN SUCCESS TOAST KEREN DI ATAS (SEPERTI GAMBAR)
-// ===============================================================
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -24,7 +20,6 @@ class _CustomerPageState extends State<CustomerPage> {
   List<Map<String, dynamic>> customers = [];
   bool isLoading = false;
 
-  // Overlay untuk toast
   OverlayEntry? _overlayEntry;
 
   @override
@@ -33,7 +28,6 @@ class _CustomerPageState extends State<CustomerPage> {
     fetchCustomers();
   }
 
-  // FUNGSI TOAST SUKSES KEREN (SEPERTI GAMBAR)
   void _showSuccessToast(String message) {
     _overlayEntry?.remove();
     _overlayEntry = OverlayEntry(
@@ -46,7 +40,7 @@ class _CustomerPageState extends State<CustomerPage> {
               margin: const EdgeInsets.only(top: 20),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF6E200D), // Warna cokelat tua
+                color: const Color(0xFF6E200D),
                 borderRadius: BorderRadius.circular(50),
                 boxShadow: [
                   BoxShadow(
@@ -96,7 +90,6 @@ class _CustomerPageState extends State<CustomerPage> {
     }
   }
 
-  // HAPUS + TOAST
   Future<void> deleteCustomer(int id, String name) async {
     try {
       await supabase.from('customers').delete().eq('customers_id', id);
@@ -114,14 +107,25 @@ class _CustomerPageState extends State<CustomerPage> {
       barrierDismissible: false,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("Konfirmasi Hapus", style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Hapus customer "$name"?\nTindakan ini tidak dapat dibatalkan.'),
+        title: const Text(
+          "Konfirmasi Hapus",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Hapus customer "$name"?\nTindakan ini tidak dapat dibatalkan.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Batal")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              "Hapus",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -150,7 +154,10 @@ class _CustomerPageState extends State<CustomerPage> {
                   topRight: Radius.circular(25),
                   bottomRight: Radius.circular(25),
                 ),
-                child: Material(color: Colors.white, child: SidebarMenu(selected: "customer")),
+                child: Material(
+                  color: Colors.white,
+                  child: SidebarMenu(selected: "customer"),
+                ),
               ),
             ),
           ),
@@ -215,22 +222,36 @@ class _CustomerPageState extends State<CustomerPage> {
                   title: Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.menu, color: primaryColor, size: isSmall ? 24 : 28),
+                        icon: Icon(
+                          Icons.menu,
+                          color: primaryColor,
+                          size: isSmall ? 24 : 28,
+                        ),
                         onPressed: _openCustomSidebar,
                       ),
                       const SizedBox(width: 10),
-                      Text("Customer", style: TextStyle(color: Colors.black, fontSize: headerFont, fontWeight: FontWeight.bold)),
+                      Text(
+                        "Customer",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: headerFont,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   actions: [
                     Container(
                       margin: const EdgeInsets.only(right: 20),
-                      decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: IconButton(
                         icon: const Icon(Icons.add, color: Colors.white),
                         onPressed: _showAddCustomerDialog,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -243,13 +264,15 @@ class _CustomerPageState extends State<CustomerPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    // Search Bar
                     Container(
                       height: 56,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFAFACAC), width: 2),
+                        border: Border.all(
+                          color: const Color(0xFFAFACAC),
+                          width: 2,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -258,11 +281,15 @@ class _CustomerPageState extends State<CustomerPage> {
                           Expanded(
                             child: TextField(
                               controller: searchController,
-                              onChanged: (v) => setState(() => searchQuery = v.toLowerCase()),
+                              onChanged: (v) =>
+                                  setState(() => searchQuery = v.toLowerCase()),
                               decoration: const InputDecoration(
                                 hintText: "Cari customer...",
                                 border: InputBorder.none,
-                                hintStyle: TextStyle(fontSize: 18, color: Color(0xFFAFACAC)),
+                                hintStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xFFAFACAC),
+                                ),
                               ),
                             ),
                           ),
@@ -274,91 +301,150 @@ class _CustomerPageState extends State<CustomerPage> {
                       child: isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : customers.isEmpty
-                              ? const Center(child: Text("Belum ada customer", style: TextStyle(fontSize: 18)))
-                              : ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  itemCount: customers.length,
-                                  itemBuilder: (context, index) {
-                                    final customer = customers[index];
-                                    final name = customer["name"] ?? "Tanpa Nama";
-                                    final firstLetter = name.isNotEmpty ? name[0].toUpperCase() : "?";
+                          ? const Center(
+                              child: Text(
+                                "Belum ada customer",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: customers.length,
+                              itemBuilder: (context, index) {
+                                final customer = customers[index];
+                                final name = customer["name"] ?? "Tanpa Nama";
+                                final firstLetter = name.isNotEmpty
+                                    ? name[0].toUpperCase()
+                                    : "?";
 
-                                    if (searchQuery.isNotEmpty && !name.toLowerCase().contains(searchQuery)) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    return Slidable(
-                                      key: ValueKey(customer["customers_id"]),
-                                      endActionPane: ActionPane(
-                                        motion: const DrawerMotion(),
-                                        extentRatio: 0.3,
-                                        children: [
-                                          SlidableAction(
-                                            onPressed: (_) => _confirmAndDelete(name, customer["customers_id"]),
-                                            backgroundColor: Colors.red,
-                                            foregroundColor: Colors.white,
-                                            icon: Icons.delete,
-                                            label: 'Hapus',
-                                          ),
-                                        ],
-                                      ),
-                                      child: Container(
-                                        height: 115,
-                                        margin: const EdgeInsets.only(bottom: 15),
-                                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
-                                          borderRadius: BorderRadius.circular(15),
+                                if (searchQuery.isNotEmpty &&
+                                    !name.toLowerCase().contains(searchQuery)) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Slidable(
+                                  key: ValueKey(customer["customers_id"]),
+                                  endActionPane: ActionPane(
+                                    motion: const DrawerMotion(),
+                                    extentRatio: 0.3,
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (_) => _confirmAndDelete(
+                                          name,
+                                          customer["customers_id"],
                                         ),
-                                        child: Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 28,
-                                              backgroundColor: primaryColor,
-                                              child: Text(firstLetter, style: const TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.bold)),
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                        label: 'Hapus',
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                    height: 115,
+                                    margin: const EdgeInsets.only(bottom: 15),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 28,
+                                          backgroundColor: primaryColor,
+                                          child: Text(
+                                            firstLetter,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 35,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            const SizedBox(width: 15),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                                  const SizedBox(height: 8),
-                                                  Text(customer["phone"] ?? "-", style: const TextStyle(color: Colors.black54)),
-                                                ],
-                                              ),
-                                            ),
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                IconButton(
-                                                  icon: Icon(Icons.edit, color: primaryColor),
-                                                  onPressed: () => _showEditCustomerDialog(index),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 15),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                name,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (_) => CustomerDetailPage(customerId: customer["customers_id"].toString()),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                                                    decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(20)),
-                                                    child: const Text("Detail", style: TextStyle(color: Colors.white, fontSize: 12)),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                customer["phone"] ?? "-",
+                                                style: const TextStyle(
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.edit,
+                                                color: primaryColor,
+                                              ),
+                                              onPressed: () =>
+                                                  _showEditCustomerDialog(
+                                                    index,
+                                                  ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        CustomerDetailPage(
+                                                          customerId:
+                                                              customer["customers_id"]
+                                                                  .toString(),
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 8,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                                child: const Text(
+                                                  "Detail",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
                                                   ),
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                     ),
                   ],
                 ),
@@ -377,10 +463,6 @@ class _CustomerPageState extends State<CustomerPage> {
     super.dispose();
   }
 }
-
-// ==============================================================
-// DIALOG — DENGAN CALLBACK SUKSES
-// ==============================================================
 
 class _CustomerDialog extends StatefulWidget {
   final String title;
@@ -407,9 +489,15 @@ class _CustomerDialogState extends State<_CustomerDialog> {
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.customer?["name"] ?? "");
-    phoneController = TextEditingController(text: widget.customer?["phone"] ?? "");
-    addressController = TextEditingController(text: widget.customer?["address"] ?? "");
+    nameController = TextEditingController(
+      text: widget.customer?["name"] ?? "",
+    );
+    phoneController = TextEditingController(
+      text: widget.customer?["phone"] ?? "",
+    );
+    addressController = TextEditingController(
+      text: widget.customer?["address"] ?? "",
+    );
   }
 
   bool _validate() {
@@ -417,19 +505,21 @@ class _CustomerDialogState extends State<_CustomerDialog> {
       nameError = nameController.text.trim().isEmpty
           ? "Nama wajib diisi"
           : nameController.text.trim().length < 3
-              ? "Minimal 3 karakter"
-              : null;
+          ? "Minimal 3 karakter"
+          : null;
 
       final phone = phoneController.text.trim();
       phoneError = phone.isEmpty
           ? "No. telepon wajib diisi"
           : !RegExp(r'^[0-9]+$').hasMatch(phone)
-              ? "Hanya boleh angka"
-              : phone.length < 10
-                  ? "Minimal 10 digit"
-                  : null;
+          ? "Hanya boleh angka"
+          : phone.length < 10
+          ? "Minimal 10 digit"
+          : null;
 
-      addressError = addressController.text.trim().isEmpty ? "Alamat wajib diisi" : null;
+      addressError = addressController.text.trim().isEmpty
+          ? "Alamat wajib diisi"
+          : null;
     });
 
     return nameError == null && phoneError == null && addressError == null;
@@ -448,16 +538,19 @@ class _CustomerDialogState extends State<_CustomerDialog> {
           "address": addressController.text.trim(),
         });
       } else {
-        await supabase.from('customers').update({
-          "name": nameController.text.trim(),
-          "phone": phoneController.text.trim(),
-          "address": addressController.text.trim(),
-        }).eq("customers_id", widget.customer!["customers_id"]);
+        await supabase
+            .from('customers')
+            .update({
+              "name": nameController.text.trim(),
+              "phone": phoneController.text.trim(),
+              "address": addressController.text.trim(),
+            })
+            .eq("customers_id", widget.customer!["customers_id"]);
       }
 
       if (mounted) {
         Navigator.pop(context);
-        widget.onSuccess?.call(); // Panggil toast sukses
+        widget.onSuccess?.call();
       }
     } catch (e) {
       debugPrint("SAVE CUSTOMER ERROR: $e");
@@ -465,34 +558,40 @@ class _CustomerDialogState extends State<_CustomerDialog> {
   }
 
   Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      );
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Text(
+      text,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    ),
+  );
 
   Widget _field(TextEditingController controller, {String? error}) => TextField(
-        controller: controller,
-        onChanged: (_) => setState(() {}),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: error != null ? Colors.red : const Color(0xFFAFACAC), width: 2),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.black, width: 2),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.red, width: 2),
-          ),
-          errorText: error,
-          errorStyle: const TextStyle(color: Colors.red),
+    controller: controller,
+    onChanged: (_) => setState(() {}),
+    decoration: InputDecoration(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: error != null ? Colors.red : const Color(0xFFAFACAC),
+          width: 2,
         ),
-      );
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.black, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red, width: 2),
+      ),
+      errorText: error,
+      errorStyle: const TextStyle(color: Colors.red),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -513,26 +612,62 @@ class _CustomerDialogState extends State<_CustomerDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Text(widget.title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
+                Center(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 25),
-                _label("Nama"), _field(nameController, error: nameError), const SizedBox(height: 16),
-                _label("No. Telepon"), _field(phoneController, error: phoneError), const SizedBox(height: 16),
-                _label("Alamat"), _field(addressController, error: addressError), const SizedBox(height: 30),
+                _label("Nama"),
+                _field(nameController, error: nameError),
+                const SizedBox(height: 16),
+                _label("No. Telepon"),
+                _field(phoneController, error: phoneError),
+                const SizedBox(height: 16),
+                _label("Alamat"),
+                _field(addressController, error: addressError),
+                const SizedBox(height: 30),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD7A797), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        child: const Text("Batal", style: TextStyle(fontSize: 20, color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD7A797),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "Batal",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _save,
-                        style: ElevatedButton.styleFrom(backgroundColor: primaryColor, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                        child: const Text("Simpan", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "Simpan",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ],

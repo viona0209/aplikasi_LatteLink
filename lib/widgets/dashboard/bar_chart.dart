@@ -42,14 +42,7 @@ class BarSalesChart extends StatelessWidget {
                 showTitles: true,
                 reservedSize: 28,
                 getTitlesWidget: (value, meta) {
-                  const months = [
-                    'Jun',
-                    'Jul',
-                    'Aug',
-                    'Sep',
-                    'Oct',
-                    'Nov',
-                  ];
+                  const months = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(

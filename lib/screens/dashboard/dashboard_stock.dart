@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:aplikasi_lattelink/widgets/dashboard/info_card.dart';
 import 'package:aplikasi_lattelink/widgets/stock_table.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'dashboard.dart';
 
 class DashboardStock extends StatefulWidget {
@@ -24,12 +23,9 @@ class _DashboardStockState extends State<DashboardStock> {
   void initState() {
     super.initState();
     fetchProducts();
-    setupRealtime(); // realtime supabase
+    setupRealtime();
   }
 
-  // ==============================
-  //    FETCH DATA DARI SUPABASE
-  // ==============================
   Future<void> fetchProducts() async {
     try {
       final data = await supabase.from('products').select('name, stock');
@@ -50,18 +46,15 @@ class _DashboardStockState extends State<DashboardStock> {
     }
   }
 
-  // ==============================
-  //      REALTIME SUPABASE
-  // ==============================
   void setupRealtime() {
     channel = supabase
         .channel('products-changes')
         .onPostgresChanges(
-          event: PostgresChangeEvent.all, // insert, update, delete
+          event: PostgresChangeEvent.all,
           schema: 'public',
           table: 'products',
           callback: (payload) {
-            fetchProducts(); // refresh data otomatis
+            fetchProducts();
           },
         )
         .subscribe();
@@ -88,10 +81,6 @@ class _DashboardStockState extends State<DashboardStock> {
 
         return Scaffold(
           backgroundColor: Colors.white,
-
-          // ============================================================
-          //                        FIXED HEADER
-          // ============================================================
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(70),
             child: SafeArea(
@@ -110,12 +99,16 @@ class _DashboardStockState extends State<DashboardStock> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const DashboardScreen()),
+                              builder: (_) => const DashboardScreen(),
+                            ),
                             (route) => false,
                           );
                         },
-                        icon: const Icon(Icons.arrow_back,
-                            size: 28, color: Colors.black),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 28,
+                          color: Colors.black,
+                        ),
                       ),
                       SizedBox(width: isSmall ? 10 : 20),
                       Text(
@@ -132,10 +125,6 @@ class _DashboardStockState extends State<DashboardStock> {
               ),
             ),
           ),
-
-          // ============================================================
-          //                           CONTENT
-          // ============================================================
           body: SingleChildScrollView(
             padding: EdgeInsets.only(
               left: paddingHorizontal,
@@ -162,8 +151,6 @@ class _DashboardStockState extends State<DashboardStock> {
                     ),
 
                     SizedBox(height: spacingMedium),
-
-                    // LOADING
                     if (loading)
                       const Center(child: CircularProgressIndicator())
                     else

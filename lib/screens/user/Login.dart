@@ -16,18 +16,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  // Error messages
   String? emailError;
   String? passwordError;
 
   @override
   void initState() {
     super.initState();
-    // Real-time validation
     emailController.addListener(_validateEmail);
     passwordController.addListener(_validatePassword);
   }
@@ -58,38 +54,33 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  bool get _isFormValid => emailError == null && passwordError == null &&
-      emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
+  bool get _isFormValid =>
+      emailError == null &&
+      passwordError == null &&
+      emailController.text.isNotEmpty &&
+      passwordController.text.isNotEmpty;
 
   Future<void> loginUser() async {
     _validateEmail();
     _validatePassword();
-
     if (!_isFormValid) return;
-
     setState(() => _isLoading = true);
-
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
-
     try {
       final res = await SupabaseConfig.client.auth.signInWithPassword(
         email: email,
         password: password,
       );
-
       final user = res.user;
-
       if (user == null) {
         _showMessage("Login gagal. Periksa email dan password.");
         return;
       }
-
       if (user.emailConfirmedAt == null) {
         _showMessage("Email belum dikonfirmasi. Cek inbox/spam.");
         return;
       }
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const DashboardScreen()),
@@ -152,23 +143,36 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: height * 0.02),
-
-              // EMAIL FIELD + ERROR
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "email@gmail.com",
-                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF8B3A22)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16 * base, vertical: 18 * base),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  prefixIcon: const Icon(
+                    Icons.email_outlined,
+                    color: Color(0xFF8B3A22),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16 * base,
+                    vertical: 18 * base,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: emailError != null ? Colors.red : Colors.grey.shade400),
+                    borderSide: BorderSide(
+                      color: emailError != null
+                          ? Colors.red
+                          : Colors.grey.shade400,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF6E200D), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF6E200D),
+                      width: 2,
+                    ),
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -183,33 +187,53 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 16),
                       const SizedBox(width: 4),
-                      Text(emailError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(
+                        emailError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
-
               SizedBox(height: height * 0.02),
-
-              // PASSWORD FIELD + ERROR
               TextField(
                 controller: passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: "password",
-                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF8B3A22)),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: Color(0xFF8B3A22),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16 * base, vertical: 18 * base),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16 * base,
+                    vertical: 18 * base,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: passwordError != null ? Colors.red : Colors.grey.shade400),
+                    borderSide: BorderSide(
+                      color: passwordError != null
+                          ? Colors.red
+                          : Colors.grey.shade400,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF6E200D), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF6E200D),
+                      width: 2,
+                    ),
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -224,14 +248,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 16),
                       const SizedBox(width: 4),
-                      Text(passwordError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(
+                        passwordError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                      ),
                     ],
                   ),
                 ),
-
               SizedBox(height: height * 0.04),
-
-              // BUTTON LOGIN
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -240,13 +264,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: const Color(0xFF6E200D),
                     disabledBackgroundColor: Colors.grey.shade400,
                     padding: EdgeInsets.symmetric(vertical: 20 * base),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(
                           "Sign In",
@@ -258,9 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
               ),
-
               SizedBox(height: height * 0.08),
-
               Text.rich(
                 TextSpan(
                   text: "by Logging in, you agree to the ",
@@ -274,9 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-
               SizedBox(height: height * 0.03),
-
               Text.rich(
                 TextSpan(
                   text: "Don’t have an account? ",
@@ -293,7 +318,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ..onTap = () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterScreen(),
+                            ),
                           );
                         },
                     ),

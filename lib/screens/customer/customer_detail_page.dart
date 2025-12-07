@@ -69,7 +69,6 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
                 IconButton(
@@ -84,7 +83,6 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
             ),
             const SizedBox(height: 20),
 
-            // Main box
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -114,7 +112,6 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Image
                               Container(
                                 width: 70,
                                 height: 65,
@@ -140,7 +137,6 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                               ),
                               const SizedBox(width: 15),
 
-                              // Name & price
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +156,6 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
                                 ),
                               ),
 
-                              // Date & qty
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [

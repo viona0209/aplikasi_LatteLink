@@ -20,7 +20,7 @@ class _ChasierProductState extends State<ChasierProduct> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = widget.product.imageUrl; // 🔥 gunakan image_url dari model
+    final imageUrl = widget.product.imageUrl;
 
     return Container(
       decoration: BoxDecoration(
@@ -62,10 +62,6 @@ class _ChasierProductState extends State<ChasierProduct> {
                 ),
               ),
               const SizedBox(width: 20),
-
-              /// ======================
-              /// QTY COUNTER
-              /// ======================
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -79,8 +75,11 @@ class _ChasierProductState extends State<ChasierProduct> {
                       onTap: () {
                         if (qty > 0) setState(() => qty--);
                       },
-                      child:
-                          const Icon(Icons.remove, color: Colors.white, size: 14),
+                      child: const Icon(
+                        Icons.remove,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -94,8 +93,11 @@ class _ChasierProductState extends State<ChasierProduct> {
                     const SizedBox(width: 6),
                     GestureDetector(
                       onTap: () => setState(() => qty++),
-                      child:
-                          const Icon(Icons.add, color: Colors.white, size: 14),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -104,10 +106,6 @@ class _ChasierProductState extends State<ChasierProduct> {
           ),
 
           const SizedBox(height: 10),
-
-          /// ======================
-          /// ADD TO CART BUTTON
-          /// ======================
           GestureDetector(
             onTap: widget.onAddToCart,
             child: Container(
@@ -117,7 +115,10 @@ class _ChasierProductState extends State<ChasierProduct> {
                 color: Colors.white.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

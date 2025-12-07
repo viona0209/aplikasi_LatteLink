@@ -21,11 +21,10 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
   final Color primary = const Color(0xFF6E200D);
 
   final screens = const [
-  SalesReportScreen(),
-  TransactionsReportScreen(),   // tanpa parameter!
-  ProfitLossScreen(),
-];
-
+    SalesReportScreen(),
+    TransactionsReportScreen(),
+    ProfitLossScreen(),
+  ];
 
   @override
   void initState() {
@@ -33,9 +32,6 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
     selectedIndex = widget.initialTab.index;
   }
 
-  // ==========================
-  // OPEN SIDEBAR (SAMA PERSIS)
-  // ==========================
   void _openSidebar(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
@@ -67,7 +63,6 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
     );
   }
 
-  // CUSTOM TAB BUTTON
   Widget buildTabButton(String label, int index) {
     bool isSelected = selectedIndex == index;
 
@@ -101,10 +96,6 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // ==========================
-      // APPBAR SAMA SEPERTI StockPage
-      // ==========================
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: SafeArea(
@@ -116,12 +107,14 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
               elevation: 0,
               automaticallyImplyLeading: false,
               titleSpacing: 0,
-
               title: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.menu,
-                        color: primary, size: isSmall ? 24 : 28),
+                    icon: Icon(
+                      Icons.menu,
+                      color: primary,
+                      size: isSmall ? 24 : 28,
+                    ),
                     onPressed: () => _openSidebar(context),
                   ),
                   const SizedBox(width: 10),
@@ -135,34 +128,13 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
                   ),
                 ],
               ),
-
-              // actions: [
-              //   Container(
-              //     margin: const EdgeInsets.only(right: 20),
-              //     decoration: BoxDecoration(
-              //       color: primary,
-              //       borderRadius: BorderRadius.circular(10),
-              //     ),
-              //     child: IconButton(
-              //       icon: const Icon(Icons.print, color: Colors.white),
-              //       onPressed: () {
-              //         // TODO: PRINT LOGIC DI SINI
-              //       },
-              //     ),
-              //   )
-              // ],
             ),
           ),
         ),
       ),
-
-      // ==========================
-      // BODY
-      // ==========================
       body: Column(
         children: [
           const SizedBox(height: 20),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -175,9 +147,7 @@ class _ReportMainScreenState extends State<ReportMainScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(child: screens[selectedIndex]),
         ],
       ),

@@ -64,21 +64,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final double headerFont = isSmall ? 18 : 24;
         final double cardSpacing = isSmall ? 20 : 26;
 
-        final double chartHeight =
-            isSmall ? 170 : (isTablet ? 280 : 220);
+        final double chartHeight = isSmall ? 170 : (isTablet ? 280 : 220);
 
         final data = salesData[selectedPeriod]!;
 
         return Scaffold(
-
-          // =====================================================
-          //                FIX APP BAR TURUN DI BAWAH
-          // =====================================================
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(70),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.only(top: 25, left: 25), // << TURUN 10PX
+                padding: const EdgeInsets.only(top: 25, left: 25),
                 child: AppBar(
                   titleSpacing: 0,
                   elevation: 0,
@@ -112,10 +107,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
 
           backgroundColor: Colors.white,
-
-          // =====================================================
-          //                        BODY
-          // =====================================================
           body: SingleChildScrollView(
             padding: EdgeInsets.only(
               left: paddingHorizontal,
@@ -129,11 +120,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: cardSpacing),
-
                     DashboardCards(activeCard: ""),
-
                     SizedBox(height: isSmall ? 20 : 26),
-
                     Text(
                       "Statistic",
                       style: TextStyle(
@@ -143,8 +131,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
 
                     const SizedBox(height: 18),
-
-                    // ==== SALES OVERVIEW ====
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
@@ -163,8 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 "Sales Overview",
@@ -176,7 +161,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Container(
                                 height: 30,
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12),
+                                  horizontal: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFE2B6A3),
                                   borderRadius: BorderRadius.circular(20),
@@ -185,8 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: DropdownButton<String>(
                                     value: selectedPeriod,
                                     isDense: true,
-                                    dropdownColor:
-                                        const Color(0xFFF8E3D8),
+                                    dropdownColor: const Color(0xFFF8E3D8),
                                     items: const [
                                       DropdownMenuItem(
                                         value: "Monthly",
@@ -204,9 +189,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 20),
-
                           SizedBox(
                             height: chartHeight,
                             child: BarSalesChart(data: data),
@@ -214,10 +197,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 40),
-
-                    // ==== DAILY SALES ====
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),

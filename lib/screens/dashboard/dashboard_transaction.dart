@@ -22,10 +22,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
     fetchTransactions();
     setupRealtime();
   }
-
-  // ================================================================
-  //                      FETCH DATA DARI DATABASE
-  // ================================================================
   Future<void> fetchTransactions() async {
     try {
       final res = await supabase
@@ -43,9 +39,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
     }
   }
 
-  // ================================================================
-  //                        REALTIME LISTENER
-  // ================================================================
   void setupRealtime() {
     supabase.channel('orders_changes').onPostgresChanges(
       event: PostgresChangeEvent.insert,
@@ -75,10 +68,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
 
         return Scaffold(
           backgroundColor: Colors.white,
-
-          // =============================================================
-          //                        HEADER
-          // =============================================================
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(70),
             child: SafeArea(
@@ -118,10 +107,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
               ),
             ),
           ),
-
-          // =============================================================
-          //                        BODY
-          // =============================================================
           body: isLoading
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
@@ -152,9 +137,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
 
                           SizedBox(height: spacingMedium),
 
-                          // =====================================================
-                          //                  TRANSACTION LIST
-                          // =====================================================
                           Column(
                             children: transactions.map((data) {
                               return Container(
@@ -183,7 +165,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // -------- NAME & AMOUNT ----------
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -205,8 +186,6 @@ class _DashboardTransactionState extends State<DashboardTransaction> {
                                     ),
 
                                     const SizedBox(height: 6),
-
-                                    // -------- TIME & STATUS ----------
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [

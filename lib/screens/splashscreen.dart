@@ -10,12 +10,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool _navigated = false; // biar gak pindah dua kali
+  bool _navigated = false;
 
   @override
   void initState() {
     super.initState();
-    // pindah otomatis setelah 5 detik
     Timer(const Duration(seconds: 5), _navigateToLogin);
   }
 
